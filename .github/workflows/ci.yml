@@ -1,0 +1,50 @@
+name: CI Gradle
+
+on:
+  pull_request:
+    branches:
+      - master
+      - main
+
+jobs:
+  Artefact-Version:
+    runs-on: ubuntu-latest
+    outputs:
+      draft_version: ${{ steps.vars.outputs.draft_version }}
+    steps:
+      - name: Get short SHA for versioning
+        id: vars
+        run: |
+          if git describe --tags --abbrev=0 >/dev/null 2>&1; then
+            LATEST_TAG=$(git describe --tags --abbrev=0)
+          else
+            LATEST_TAG="v0.0.0"
+          fi
+
+          SHORT_SHA=$(git rev-parse --short HEAD)
+          DRAFT_VERSION="${LATEST_TAG}-${SHORT_SHA}"
+
+          echo "draft_version=$DRAFT_VERSION"
+          echo "draft_version=$DRAFT_VERSION" >> $GITHUB_OUTPUT
+
+  Build:
+    needs: [Artefact-Version]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: current
+
+      - name: Validate Gradle Wrapper
+        uses: gradle/actions/wrapper-validation@v4
+
+      - name: Run Gradle
+        env:
+          API_SPEC_VERSION: ${{ needs.Artefact-Version.outputs.draft_version }}
+        run: |
+          gradle build

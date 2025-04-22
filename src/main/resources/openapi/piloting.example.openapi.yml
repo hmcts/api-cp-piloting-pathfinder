@@ -1,0 +1,47 @@
+openapi: 3.0.0
+servers:
+  - description: APIHub API Auto Mocking Pilot API
+    url: https://virtserver.swaggerhub.com/HMCTS-DTS/api-cp-piloting-pathfinder/0.0.0
+
+info:
+  version: 0.0.0
+  title: Piloting API
+  description: A simple API for the experiments that will help shape the API strategy.
+  contact:
+    email: no-reply@hmcts.com
+  license:
+    name: MIT
+    url: 'https://opensource.org/licenses/MIT'
+
+tags:
+  - name: Judges
+    description: Judge information within the judiciary domain
+paths:
+  /example/judges/{judge_id}:
+    get:
+      description: Retrieve details of a judge by judge ID.
+      operationId: getJudgeById
+      tags:
+        - Judges
+      parameters:
+        - in: path
+          name: judge_id
+          required: true
+          description: Unique reference number for the court house
+          schema:
+            type: string
+      responses:
+        '200':
+          description: judge details found
+          content:
+            application/json:
+              schema:
+                $ref: "piloting.example.schema.json"
+              example:
+                judiciary:
+                  johTitle: "His Honour"
+                  johNameSurname: "John Smith"
+                  role: "judge"
+                  johKnownAs: "His Honour Judge Smith"
+        '400':
+          description: bad input parameter

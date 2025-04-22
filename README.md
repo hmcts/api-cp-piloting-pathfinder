@@ -1,90 +1,62 @@
-# API-CP Template Repository
+# API CP Piloting Pathfinder
 
-This is a template repository for Common Platform (CP) APIs in HMCTS. It defines naming conventions, structure, and validation tooling for OpenAPI specifications.
+This repository supports early experimentation, prototyping, and validation of API-based data sharing approaches to inform a scalable model for cross-CJS integration.
 
-> 🔗 API definitions should follow the [HMCTS RESTful API Standards](https://hmcts.github.io/restful-api-standards/).  
-> 📘 See [APIVERSIONING.md](./APIVERSIONING.md) for our CP API versioning strategy based on media types and SemVer.
+## Installation
 
-## Naming Convention
-
-> NOTE: Avoid using terms like `common, core, base, utils, helpers, misc, or shared`.
-> These names often allow for ambiguous ownership and quickly become black holes where cohesion goes to die.
-
-Repository names follow a pattern from generic to specific:
-
+If using a macOS then it is recommended to use [Homebrew](https://brew.sh/):
 ```
-api-cp-[case-type]-{product-domain}-{name-of-entity}
+brew install gradle
 ```
-The optional `case-type` parameter could be:
+Alternatively see Gradle Build Tool [install](https://gradle.org/install/) for alternative options
 
-* civil 
-* crime 
-* family 
-* tribunal
+## 📘 OpenAPI Versioning Strategy
 
-HMCTS manages all Civil, Criminal, Family (separate from civil), and Tribunal cases.
+This project uses an automated GitHub Actions workflow to manage versioning and publishing of the OpenAPI specification to SwaggerHub.
 
-### Reference Data Repositories
+### 📌 Version Types
+This project follows [Semantic Versioning](https://semver.org) (SemVer) conventions.
 
-Reference data APIs use the following naming format:
+We support two types of versions:
 
-```
-api-cp-refdata-{product-domain}-{name-of-entity}
-```
-Some might argue that `product-domain` should be optional for reference data, placing it under global ownership. But global ownership often means no ownership — and no accountability. Therefore, `product-domain` is **required**.
+### 🔧 Draft Versions (on every merge to main or master)
+* Triggered by: push to main or master 
+* Version format: vX.Y.Z-&lt;short-sha&gt;, e.g. v0.2.1-a1b2c3d
+  * If no release tag exists, defaults to v0.0.0-&lt;short-sha&gt;
+* Purpose: Used for previewing or collaborating on in-progress API definitions. 
+* Behaviour:
+  * The OpenAPI info.version is set automatically. 
+  * The spec is uploaded to SwaggerHub as:
+    * visibility: public 
+    * published: false
 
-## Post-Template Manual Steps
+### 🚀 Release Versions (on GitHub release publish)
 
-### Setup
+* Triggered by: Publishing a GitHub release via the UI 
+* Git tag format: vX.Y.Z (e.g. v1.0.0)
+* Version used: X.Y.Z (without the v)
+* Purpose: Final, published version of the API for public consumption.
+* Behaviour:
+  * The OpenAPI info.version is set to the release tag version. 
+  * The spec is uploaded to SwaggerHub as:
+    * visibility: public 
+    * published: true
 
-* Go to settings of the repository -> General -> check "Automatically delete head branches"
-* Import the ruleset `.github/rulesets/master.json`  
-  To import the ruleset, follow GitHub’s instructions here:  
-  👉 [Importing a ruleset](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/managing-rulesets-for-a-repository#importing-a-ruleset)
-  
-Once the ruleset has been successfully imported via GitHub Settings, the new repository no longer requires `.github/rulesets/master.json` so it **should be deleted**:
+### 🔒 Secrets Required
 
-### Clean Up
+Ensure the following secrets are configured in your GitHub repository:
 
-After using this template to create your repository, the following files are no longer needed and **should be deleted**:
+| Secret Name              | Description                                 |
+|--------------------------|---------------------------------------------|
+| `SWAGGERHUB_API_KEY`     | API token for authenticating with SwaggerHub |
+| `APIHUB_ORGANISATION`    | SwaggerHub username or organisation name    |
 
-- `./APIVERSIONING.md`
-- `./openapi/deleteme`
+### 📁 OpenAPI File Location
 
-Update the `./README.md` to reflect the context of the new created repository
+The OpenAPI spec file must be located in: `src/main/resources/openapi/*.openapi.yml`
 
-
-## OpenAPI Specification and Data Schema Validation
-
-This repository includes a GitHub Action to validate OpenAPI specifications and data payload JSON Schemas.
-
-### Run Validation Locally
-
-> Node must be installed on your machine.
-
-Install dependencies:
-```bash
-npm install -g @stoplight/spectral-cli ajv-cli jsonlint
-```
-
-Validate the OpenAPI specification:
-```bash
-spectral lint "openapi/**/*.{yml,yaml}"
-```
-Documentation: https://stoplight.io/open-source/spectral
-
-Validate the data payload JSON Schemas:
-```bash
-jsonlint -q ./openapi/path/to/example_payload.json
-```
-
-Validate the data payload JSON Schemas:
-```bash
-ajv --spec=draft2020 --strict=false -s "./openapi/path/to/schema.json" -d "./openapi/path/to/example_payload.json"
-```
-Documentation: https://ajv.js.org/
+Only the first file matching that pattern will be used.
 
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
-

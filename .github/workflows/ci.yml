@@ -43,9 +43,6 @@ jobs:
         with:
           gradle-version: current
 
-      - name: Validate Gradle Wrapper
-        uses: gradle/actions/wrapper-validation@v4
-
       - name: Run Gradle
         env:
           API_SPEC_VERSION: ${{ needs.Artefact-Version.outputs.draft_version }}

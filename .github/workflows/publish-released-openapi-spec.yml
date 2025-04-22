@@ -58,8 +58,8 @@ jobs:
     needs: [ API-Version, Apply-Version-to-API-Spec ]
     runs-on: ubuntu-latest
     env:
-      SWAGGERHUB_API_KEY: ${{ secrets.SWAGGERHUB_API_KEY }}
-      APIHUB_OWNER: ${{ secrets.APIHUB_ORGANISATION }}
+      SWAGGERHUB_API_KEY: ${{ secrets.APIHUB_API_KEY }}
+      APIHUB_OWNER: ${{ vars.APIHUB_ORGANISATION }}
       API_NAME: ${{ github.event.repository.name }}
       API_VERSION: ${{ needs.API-Version.outputs.released_version }}
       CLI_API_REF: ${{ env.APIHUB_OWNER }}/${{ env.API_NAME }}/${{ env.API_VERSION }}

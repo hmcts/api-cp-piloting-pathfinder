@@ -126,20 +126,29 @@ tasks.named('compileJava') {
   dependsOn tasks.named('spotlessApply')
 }
 
+def formatterUrl = 'https://raw.githubusercontent.com/hmcts/api-cp-code-style/refs/heads/master/config/formatter/eclipse-formatter.xml'
+def formatterPath = "$buildDir/eclipse-formatter.xml"
+tasks.register('downloadFormatter') {
+  outputs.file(formatterPath)
+  doLast {
+    def file = new File(formatterPath)
+    file.parentFile.mkdirs()
+    file.text = new URL(formatterUrl).text
+  }
+}
 spotless {
   java {
     target 'build/generated/src/main/**/*.java'
     removeUnusedImports()
-    eclipse().configFile('config/formatter/eclipse-formatter.xml')
+    eclipse().configFile(formatterPath)
   }
 }
 
-tasks.named('spotlessJava') {
-  dependsOn tasks.named('openApiGenerate')
-}
-
 tasks.named('spotlessApply') {
-  dependsOn tasks.named('openApiGenerate')
+  dependsOn tasks.named('openApiGenerate'), tasks.named('downloadFormatter')
+}
+tasks.named('spotlessJava') {
+  dependsOn tasks.named('openApiGenerate'), tasks.named('downloadFormatter')
 }
 
 tasks.withType(Checkstyle).configureEach {

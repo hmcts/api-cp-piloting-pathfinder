@@ -80,18 +80,6 @@ jobs:
         run: |
           echo "CLI_API_REF=${APIHUB_OWNER}/${API_NAME}/${API_VERSION}" >> "$GITHUB_ENV"
 
-      - name: Delete all draft versions starting with "v"
-        run: |
-          echo "🔄 Deleting draft versions starting with 'v' for ${CLI_API_REF%/*}..."
-          # Get the list of versions for the API
-          swaggerhub api:list "${CLI_API_REF%/*}" --limit 100 --json > versions.json
-
-          # Filter out drafts that start with 'v' and delete them
-          jq -r '.apis[] | select(.published == false and (.version | test("^v"))) | .version' versions.json | while read version; do
-            echo "🗑️ Deleting draft version: $version"
-            swaggerhub api:delete "${CLI_API_REF%/*}/$version" --force
-          done
-
       - name: Push API definition into API Hub (PUBLISHED)
         # https://github.com/SmartBear/swaggerhub-cli?tab=readme-ov-file#swaggerhub-apicreate
         run: |

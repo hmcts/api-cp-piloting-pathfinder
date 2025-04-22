@@ -58,7 +58,7 @@ jobs:
     needs: [ API-Version, Apply-Version-to-API-Spec ]
     runs-on: ubuntu-latest
     env:
-      SWAGGERHUB_API_KEY: ${{ secrets.APIHUB_API_KEY
+      SWAGGERHUB_API_KEY: ${{ secrets.APIHUB_API_KEY }}
 
     steps:
       - name: Download versioned OpenAPI spec

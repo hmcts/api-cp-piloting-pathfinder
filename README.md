@@ -46,10 +46,10 @@ We support two types of versions:
 
 Ensure the following secrets are configured in your GitHub repository:
 
-| Secret Name              | Description                                 |
-|--------------------------|---------------------------------------------|
-| `SWAGGERHUB_API_KEY`     | API token for authenticating with SwaggerHub |
-| `APIHUB_ORGANISATION`    | SwaggerHub username or organisation name    |
+| Secret/Variable Name  | Description                                 |
+|-----------------------|---------------------------------------------|
+| `APIHUB_API_KEY`  | API token for authenticating with SwaggerHub |
+| `APIHUB_ORGANISATION` | SwaggerHub username or organisation name    |
 
 ### 📁 OpenAPI File Location
 

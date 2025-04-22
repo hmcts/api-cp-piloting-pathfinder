@@ -81,11 +81,9 @@ jobs:
           echo "CLI_API_REF=${APIHUB_OWNER}/${API_NAME}/${API_VERSION}" >> "$GITHUB_ENV"
 
       - name: Push API definition into API Hub (PUBLISHED)
-        env:
-          PUBLISHED: true
         # https://github.com/SmartBear/swaggerhub-cli?tab=readme-ov-file#swaggerhub-apicreate
         run: |
-          swaggerhub api:create "${CLI_API_REF}" --file openapi-versioned.yml --published ${PUBLISHED} --visibility public
+          swaggerhub api:create "${CLI_API_REF}" --file openapi-versioned.yml --published publish --visibility public
 
       - name: Check the API definition exists
         # https://github.com/SmartBear/swaggerhub-cli?tab=readme-ov-file#swaggerhub-apiget

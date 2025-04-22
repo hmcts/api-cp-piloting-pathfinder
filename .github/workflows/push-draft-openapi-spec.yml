@@ -68,11 +68,7 @@ jobs:
     needs: [API-Version, Apply-Version-to-API-Spec]
     runs-on: ubuntu-latest
     env:
-      SWAGGERHUB_API_KEY: ${{ secrets.APIHUB_API_KEY }}
-      APIHUB_OWNER: ${{ vars.APIHUB_ORGANISATION }}
-      API_NAME: ${{ github.event.repository.name }}
-      API_VERSION: ${{ needs.API-Version.outputs.draft_version }}
-      CLI_API_REF: ${{ env.APIHUB_OWNER }}/${{ env.API_NAME }}/${{ env.API_VERSION }}
+      SWAGGERHUB_API_KEY: ${{ secrets.APIHUB_API_KEY
 
     steps:
       - name: Download versioned OpenAPI spec
@@ -85,6 +81,15 @@ jobs:
 
       - name: Install SwaggerHub CLI
         run: npm install -g swaggerhub-cli
+
+      - name: Set CLI_API_REF env var
+        env:
+          SWAGGERHUB_API_KEY: ${{ secrets.APIHUB_API_KEY }}
+          APIHUB_OWNER: ${{ vars.APIHUB_ORGANISATION }}
+          API_NAME: ${{ github.event.repository.name }}
+          API_VERSION: ${{ needs.API-Version.outputs.draft_version }}
+        run: |
+          echo "CLI_API_REF=${APIHUB_OWNER}/${API_NAME}/${API_VERSION}" >> "$GITHUB_ENV"
 
       - name: Push API definition into API Hub (UNPUBLISHED)
         # https://github.com/SmartBear/swaggerhub-cli?tab=readme-ov-file#swaggerhub-apicreate

@@ -130,13 +130,6 @@ spotless {
   java {
     target 'build/generated/src/main/**/*.java'
     removeUnusedImports()
-    eclipse().configFile('config/formatter/eclipse-formatter.xml')
-  }
-}
-spotless {
-  java {
-    target 'build/generated/src/main/**/*.java'
-    removeUnusedImports()
     eclipse().configFile('https://raw.githubusercontent.com/hmcts/api-cp-code-style/refs/heads/master/config/formatter/eclipse-formatter.xml')
   }
 }

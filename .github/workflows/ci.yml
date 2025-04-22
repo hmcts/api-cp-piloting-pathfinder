@@ -50,10 +50,8 @@ jobs:
           gradle-version: current
 
       - name: Run Gradle
-        env:
-          API_SPEC_VERSION: ${{ needs.Artefact-Version.outputs.draft_version }}
         run: |
-          gradle build
+          gradle build -DAPI_SPEC_VERSION=${{ needs.Artefact-Version.outputs.draft_version }}
 
       - name: Upload build artefacts
         if: success()

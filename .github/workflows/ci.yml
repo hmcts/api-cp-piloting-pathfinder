@@ -54,12 +54,14 @@ jobs:
           gradle-version: current
 
       - name: Gradle Build and Publish
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gradle build publish \
             -DAPI_SPEC_VERSION=${{ needs.Artefact-Version.outputs.draft_version }} \
             -DGITHUB_REPOSITORY=${{ github.repository }} \
             -DGITHUB_ACTOR=${{ github.actor }} \
-            -DGITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}
+            -DGITHUB_TOKEN=$GITHUB_TOKEN
 
       - name: Upload build artefacts
         if: success()

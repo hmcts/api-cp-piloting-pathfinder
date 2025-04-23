@@ -51,8 +51,11 @@ jobs:
 
       - name: Gradle Build and Publish
         run: |
-          gradle build -DAPI_SPEC_VERSION=${{ needs.Artefact-Version.outputs.draft_version }}
-          gradle publish -DGITHUB_REPOSITORY=${{ github.repository }} -DGITHUB_ACTOR=${{ github.actor }} -DGITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}
+          gradle build publish \
+            -DAPI_SPEC_VERSION=${{ needs.Artefact-Version.outputs.draft_version }} \
+            -DGITHUB_REPOSITORY=${{ github.repository }} \
+            -DGITHUB_ACTOR=${{ github.actor }} \
+            -DGITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload build artefacts
         if: success()

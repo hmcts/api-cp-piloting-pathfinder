@@ -49,9 +49,10 @@ jobs:
         with:
           gradle-version: current
 
-      - name: Run Gradle
+      - name: Gradle Build and Publish
         run: |
           gradle build -DAPI_SPEC_VERSION=${{ needs.Artefact-Version.outputs.draft_version }}
+          gradle publish -DGITHUB_REPOSITORY=${{ github.repository }} -DGITHUB_ACTOR=${{ github.actor }} -DGITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload build artefacts
         if: success()
@@ -59,6 +60,3 @@ jobs:
         with:
           name: ${{ github.event.repository.name }}-jar
           path: build/libs/
-
-      - name: Publish to GitHub Packages
-        run: gradle publish -DGITHUB_REPOSITORY=${{ github.repository }} -DGITHUB_ACTOR=${{ github.actor }} -DGITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}

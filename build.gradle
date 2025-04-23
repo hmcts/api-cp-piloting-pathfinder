@@ -4,6 +4,7 @@ plugins {
   id 'com.diffplug.spotless' version '7.0.3'
   id 'org.sonarqube' version '6.1.0.5360'
   id 'jacoco'
+  id 'maven-publish'
 }
 
 plugins {
@@ -84,6 +85,37 @@ repositories {
   mavenCentral()
   maven {
     url = 'https://jitpack.io'
+  }
+}
+
+publishing {
+  publications {
+    mavenJava(MavenPublication) {
+      from components.java
+    }
+  }
+  repositories {
+    def githubActor = System.getenv("GITHUB_ACTOR")
+    def githubToken = System.getenv("GITHUB_TOKEN")
+    def githubRepo = System.getenv("GITHUB_REPOSITORY")
+
+    //debugging
+    if (githubActor != null && githubToken != null && githubRepo != null) {
+      println "🔐 Configuring GitHub Packages publishing to: https://maven.pkg.github.com/$githubRepo"
+    } else {
+      println "⚠️ GitHub Packages publishing is disabled — missing one or more required environment variables:"
+      println " - GITHUB_ACTOR=${githubActor != null ? '✔' : '❌'}"
+      println " - GITHUB_TOKEN=${githubToken != null ? '✔' : '❌'}"
+      println " - GITHUB_REPOSITORY=${githubRepo != null ? '✔' : '❌'}"
+    }
+    maven {
+      name = "GitHubPackages"
+      url = uri("https://maven.pkg.github.com/$githubRepo")
+      credentials {
+        username = githubActor
+        password = githubToken
+      }
+    }
   }
 }
 

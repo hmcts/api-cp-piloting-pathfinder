@@ -6,6 +6,10 @@ on:
       - master
       - main
 
+permissions:
+  contents: read
+  packages: write
+
 jobs:
   Artefact-Version:
     runs-on: ubuntu-latest
@@ -49,9 +53,15 @@ jobs:
         with:
           gradle-version: current
 
-      - name: Run Gradle
+      - name: Gradle Build and Publish
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gradle build -DAPI_SPEC_VERSION=${{ needs.Artefact-Version.outputs.draft_version }}
+          gradle build publish \
+            -DAPI_SPEC_VERSION=${{ needs.Artefact-Version.outputs.draft_version }} \
+            -DGITHUB_REPOSITORY=${{ github.repository }} \
+            -DGITHUB_ACTOR=${{ github.actor }} \
+            -DGITHUB_TOKEN=$GITHUB_TOKEN
 
       - name: Upload build artefacts
         if: success()

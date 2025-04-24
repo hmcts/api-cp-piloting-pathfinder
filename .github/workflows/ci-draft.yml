@@ -56,16 +56,18 @@ jobs:
       - name: TEMP
         run: |
           echo "### Changelog for ${{ needs.Artefact-Version.outputs.draft_version }}" > CHANGELOG.md
-          LAST_TAG=$(git tag --sort=-creatordate | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+' | grep -v "${GITHUB_REF_NAME}" | head -n 1)
+
+          LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+
           if [ -z "$LAST_TAG" ]; then
-            echo "No previous release tag found. Logging all commits."
-            git log --pretty=format:"- %s %b (%an)" --no-merges \
-              | sed -E "s/#([0-9]+)/[#\1](https:\/\/github.com\/${{ github.repository }}\/pull\/\1)/g" \
+            echo "No previous tag found. Logging all commits."
+            git log --pretty=format:"- %s (%an)" --no-merges \
+              | sed -E "s/#([0-9]+)/[#\1]/g" \
               >> CHANGELOG.md
           else
-            echo "Generating changelog since tag: $LAST_TAG"
-            git log --pretty=format:"- %s %b (%an)" --no-merges "$LAST_TAG"..HEAD \
-              | sed -E "s/#([0-9]+)/[#\1](https:\/\/github.com\/${{ github.repository }}\/pull\/\1)/g" \
+            echo "Generating changelog since $LAST_TAG"
+            git log --pretty=format:"- %s (%an)" --no-merges "$LAST_TAG"..HEAD \
+              | sed -E "s/#([0-9]+)/[#\1]/g" \
               >> CHANGELOG.md
           fi
 

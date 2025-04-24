@@ -1,0 +1,68 @@
+name: CI Build and Publish Increments Draft
+
+on:
+  pull_request:
+    branches:
+      - master
+      - main
+
+jobs:
+  Artefact-Version:
+    runs-on: ubuntu-latest
+    outputs:
+      draft_version: ${{ steps.vars.outputs.draft_version }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Get short SHA for versioning
+        id: vars
+        run: |
+          if git describe --tags --abbrev=0 >/dev/null 2>&1; then
+            LATEST_TAG=$(git describe --tags --abbrev=0)
+          else
+            LATEST_TAG="v0.0.0"
+          fi
+
+          SHORT_SHA=$(git rev-parse --short HEAD)
+          DRAFT_VERSION="${LATEST_TAG}-${SHORT_SHA}"
+
+          echo "draft_version=$DRAFT_VERSION"
+          echo "draft_version=$DRAFT_VERSION" >> $GITHUB_OUTPUT
+
+  Build:
+    needs: [Artefact-Version]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: current
+
+      - name: Generate changelog from commit history
+        run: |
+          echo "### Changelog for ${{ needs.Artefact-Version.outputs.draft_version }}" > CHANGELOG.md
+          git log --pretty=format:"- %s (%an)" --no-merges -n 20 >> CHANGELOG.md
+
+      - name: Gradle Build and Publish
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION=${{ needs.Artefact-Version.outputs.draft_version }}
+          VERSION=${VERSION#v}
+
+          gradle build publish \
+            -DAPI_SPEC_VERSION=$VERSION \
+            -DGITHUB_REPOSITORY=${{ github.repository }} \
+            -DGITHUB_ACTOR=${{ github.actor }} \
+            -DGITHUB_TOKEN=$GITHUB_TOKEN

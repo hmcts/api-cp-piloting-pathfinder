@@ -100,14 +100,14 @@ publishing {
     def githubRepo = System.getenv("GITHUB_REPOSITORY")
 
     //debugging
-    if (githubActor != null && githubToken != null && githubRepo != null) {
+    if (githubActor != null) {
       println "🔐 Configuring GitHub Packages publishing to: https://maven.pkg.github.com/$githubRepo"
-    } else {
-      println "⚠️ GitHub Packages publishing is disabled — missing one or more required environment variables:"
-      println " - GITHUB_ACTOR=${githubActor != null ? '✔' : '❌'}"
-      println " - GITHUB_TOKEN=${githubToken != null ? '✔' : '❌'}"
-      println " - GITHUB_REPOSITORY=${githubRepo != null ? '✔' : '❌'}"
     }
+    println "GitHub Packages publishing required environment variables:"
+    println " - GITHUB_ACTOR=${githubActor != null ? '✔' : '❌'}"
+    println " - GITHUB_TOKEN=${githubToken != null ? '✔' : '❌'}"
+    println " - GITHUB_REPOSITORY=${githubRepo != null ? '✔' : '❌'}"
+
     maven {
       name = "GitHubPackages"
       url = uri("https://maven.pkg.github.com/$githubRepo")
@@ -116,6 +116,16 @@ publishing {
         password = githubToken
       }
     }
+  }
+}
+
+jar {
+  if (file("CHANGELOG.md").exists()) {
+    from('CHANGELOG.md') {
+      into 'META-INF'
+    }
+  } else {
+    println "⚠️  CHANGELOG.md not found, skipping inclusion in JAR"
   }
 }
 

@@ -45,7 +45,7 @@ jobs:
         run: |
           echo "### Changelog for ${{ needs.Artefact-Version.outputs.draft_version }}" > CHANGELOG.md
           LAST_TAG=$(git describe --tags --abbrev=0 HEAD^)
-          git log --pretty=format:"- %s %b (%an)" --no-merges $LAST_TAG..HEAD | sed -E 's/\(#[0-9]+\)/[&](https:\/\/github.com\/${{ github.repository }}\/pull\/\1)/g' >> CHANGELOG.md
+          git log --pretty=format:"- %s %b (%an)" --no-merges $LAST_TAG..HEAD | sed -E 's/\#([0-9]+)/[#\1](https:\/\/github.com\/${{ github.repository }}\/pull\/\1)/g' >> CHANGELOG.md
 
       - name: Gradle Build and Publish
         env:

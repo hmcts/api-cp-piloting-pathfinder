@@ -2,6 +2,14 @@
 .gradle
 **/build/
 !src/**/build/
+wrapper
+gradlew
+gradlew.bat
+
+### NPM ###
+node_modules
+package.json
+package-lock.json
 
 # Ignore Gradle GUI config
 gradle-app.setting
@@ -20,6 +28,7 @@ gradle-app.setting
 .project
 # JDT-specific (Eclipse Java Development Tools)
 .classpath
+.idea
 
 ### Gradle Patch ###
 # Java heap dump

@@ -55,7 +55,7 @@ jobs:
             git log --pretty=format:"- %s (%an)" --no-merges "$LAST_TAG"..HEAD \
               | sed -E "s/#([0-9]+)/[#\1]/g" \
               >> CHANGELOG.md
-          fiL
+          fi
 
       - name: Gradle Build and Publish
         env:

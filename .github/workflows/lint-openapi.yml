@@ -22,16 +22,12 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Install dependencies
-        run: |
-          npm install -g @stoplight/spectral-cli
-          npm install -g jsonlint
-          npm install ajv ajv-formats ajv-keywords
-
       - name: Lint JSON schema example responses
         run: |
+          npm install -g jsonlint
+
           shopt -s globstar nullglob
-          files=$(find src/main/resources/openapi -name "*.schema.json")
+          files=$(find src/main/resources/openapi/schema -name "*.json" ! -name "*.example.json")
           if [ -z "$files" ]; then
             echo "✅ No example JSON files to lint."
           else
@@ -43,19 +39,24 @@ jobs:
 
       - name: Validate JSON schema responses
         run: |
-          for schema in src/main/resources/openapi/*.schema.json; do
-            # Replace ".schema.json" with ".schema.example.json" to get the data file name
-            datafile="${schema/.schema.json/.schema.example.json}"
+          npm install ajv ajv-formats ajv-keywords
+
+          for schemaFile in $(find src/main/resources/openapi -name "*.json" ! -name "*.example.json"); do
+            # Replace ".json" with ".example.json" to get the data file name
+            datafile="${schemaFile/.json/.example.json}"
+            echo "datafile=$datafile"
           
             if [ -f "$datafile" ]; then
-              echo "Validating $datafile against schema $schema"
+              echo "Validating $datafile against schema $schemaFile"
               # strict mode is off because the "example" attribute is useful for openapi specs
-              node scripts/ajv-validate.js "$schema" "$datafile" || exit 1
+              node scripts/ajv-validate.js "$schemaFile" "$datafile" || exit 1
             else
-              echo "⚠️ Skipping: no example file found for $schema"
+              echo "⚠️ Skipping: no example file found for $schemaFile"
             fi
           done
 
       - name: Run Spectral on API specs
         run: |
+          npm install -g @stoplight/spectral-cli
+
           spectral lint "src/main/resources/openapi/*.{yml,yaml}" || exit 1

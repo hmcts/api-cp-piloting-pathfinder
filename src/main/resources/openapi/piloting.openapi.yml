@@ -36,7 +36,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "piloting.example.schema.json"
+                $ref: "schema/piloting.json"
               example:
                 judiciary:
                   johTitle: "His Honour"

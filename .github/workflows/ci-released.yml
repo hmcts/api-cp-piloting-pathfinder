@@ -10,7 +10,7 @@ jobs:
   Artefact-Version:
     runs-on: ubuntu-latest
     outputs:
-      RELEASED_VERSION: ${{ steps.vars.outputs.version }}
+      RELEASED_VERSION: ${{ steps.vars.outputs.RELEASED_VERSION }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -20,7 +20,7 @@ jobs:
         run: |
           TAG_NAME="${GITHUB_REF#refs/tags/}"
           VERSION="${TAG_NAME#v}"  # strip 'v' prefix
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "RELEASED_VERSION=$VERSION" >> $GITHUB_OUTPUT
 
   Build:
     needs: [Artefact-Version]

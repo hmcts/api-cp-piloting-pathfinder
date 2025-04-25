@@ -6,8 +6,8 @@ on:
       - master
       - main
 
-  env:
-    FILE_PATH_OPENAPI: "src/main/resources/openapi"
+env:
+  FILE_PATH_OPENAPI: "src/main/resources/openapi"
 
 jobs:
   Artefact-Version:

@@ -7,6 +7,9 @@ on:
       - main
 
 jobs:
+  env:
+    FILE_PATH_OPENAPI: "src/main/resources/openapi"
+
   Artefact-Version:
     runs-on: ubuntu-latest
     outputs:
@@ -48,8 +51,6 @@ jobs:
 
       - name: Find OpenAPI file
         id: find_spec
-        env:
-          FILE_PATH_OPENAPI: "src/main/resources/openapi"
         run: |
           FILE=$(find ${FILE_PATH_OPENAPI} -name "*.openapi.yml" | head -n 1)
           echo "openapi_file=$FILE" >> $GITHUB_OUTPUT
@@ -69,6 +70,12 @@ jobs:
       - name: Replace original OpenAPI file
         run: mv openapi-versioned.yml "${{ steps.find_spec.outputs.openapi_file }}"
 
+      - name: Upload updated OpenAPI file
+        uses: actions/upload-artifact@v4
+        with:
+          name: updated-openapi-spec
+          path: ${{ steps.find_spec.outputs.openapi_file }}
+
   Build:
     needs: [Artefact-Version, Update-Spec-Version]
     runs-on: ubuntu-latest
@@ -87,6 +94,12 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: current
+
+      - name: Download updated OpenAPI file
+        uses: actions/download-artifact@v4
+        with:
+          name: updated-openapi-spec
+          path: ${{ env.FILE_PATH_OPENAPI }}
 
       - name: Gradle Build and Publish
         env:

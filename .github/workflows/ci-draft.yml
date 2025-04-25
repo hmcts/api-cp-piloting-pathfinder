@@ -6,18 +6,23 @@ on:
       - master
       - main
 
+env:
+  FILE_PATH_OPENAPI: "src/main/resources/openapi"
+
 jobs:
   Artefact-Version:
     runs-on: ubuntu-latest
     outputs:
       draft_version: ${{ steps.vars.outputs.draft_version }}
+      latest_tag: ${{ steps.vars.outputs.latest_tag }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - run: git tag --list && git log --oneline --decorate
+      - name: Show Git tags and commit context (diagnostic/debug)
+        run: git tag --list && git log --oneline --decorate
 
       - name: Get short SHA for versioning
         id: vars
@@ -27,6 +32,7 @@ jobs:
           else
             LATEST_TAG="v0.0.0"
           fi
+          echo "latest_tag=$LATEST_TAG" >> $GITHUB_OUTPUT
 
           SHORT_SHA=$(git rev-parse --short HEAD)
           DRAFT_VERSION="${LATEST_TAG}-${SHORT_SHA}"
@@ -34,8 +40,44 @@ jobs:
           echo "draft_version=$DRAFT_VERSION"
           echo "draft_version=$DRAFT_VERSION" >> $GITHUB_OUTPUT
 
-  Build:
+  Update-Spec-Version:
     needs: [Artefact-Version]
+    runs-on: ubuntu-latest
+    outputs:
+      openapi_file: ${{ steps.find_spec.outputs.openapi_file }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Find OpenAPI file
+        id: find_spec
+        run: |
+          FILE=$(find ${FILE_PATH_OPENAPI} -name "*.openapi.yml" | head -n 1)
+          echo "openapi_file=$FILE" >> $GITHUB_OUTPUT
+
+      - name: Update info.version in OpenAPI spec using yq
+        env:
+          API_NAME: ${{ github.event.repository.name }}
+          API_VERSION: ${{ needs.Artefact-Version.outputs.draft_version }}
+        uses: mikefarah/yq@v4.45.1
+        with:
+          cmd: |
+            yq '
+              .info.version = strenv(API_VERSION) |
+              .servers[0].url = "https://virtserver.swaggerhub.com/HMCTS-DTS/" + strenv(API_NAME) + "/" + strenv(API_VERSION)
+            ' "${{ steps.find_spec.outputs.openapi_file }}" > openapi-versioned.yml
+
+      - name: Replace original OpenAPI file
+        run: mv openapi-versioned.yml "${{ steps.find_spec.outputs.openapi_file }}"
+
+      - name: Upload updated OpenAPI file
+        uses: actions/upload-artifact@v4
+        with:
+          name: updated-openapi-spec
+          path: ${{ steps.find_spec.outputs.openapi_file }}
+
+  Build:
+    needs: [Artefact-Version, Update-Spec-Version]
     runs-on: ubuntu-latest
 
     steps:
@@ -53,10 +95,11 @@ jobs:
         with:
           gradle-version: current
 
-      - name: Generate changelog from commit history
-        run: |
-          echo "### Changelog for ${{ needs.Artefact-Version.outputs.draft_version }}" > CHANGELOG.md
-          git log --pretty=format:"- %s (%an)" --no-merges -n 20 >> CHANGELOG.md
+      - name: Download updated OpenAPI file
+        uses: actions/download-artifact@v4
+        with:
+          name: updated-openapi-spec
+          path: ${{ env.FILE_PATH_OPENAPI }}
 
       - name: Gradle Build and Publish
         env:

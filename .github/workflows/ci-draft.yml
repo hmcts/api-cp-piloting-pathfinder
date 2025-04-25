@@ -11,6 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       draft_version: ${{ steps.vars.outputs.draft_version }}
+      latest_tag: ${{ steps.vars.outputs.latest_tag }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -28,6 +29,7 @@ jobs:
           else
             LATEST_TAG="v0.0.0"
           fi
+          echo "latest_tag=$LATEST_TAG" >> $GITHUB_OUTPUT
 
           SHORT_SHA=$(git rev-parse --short HEAD)
           DRAFT_VERSION="${LATEST_TAG}-${SHORT_SHA}"
@@ -86,13 +88,18 @@ jobs:
         with:
           gradle-version: current
 
-      - name: Generate changelog
+      - name: Generate changelog using changelog-action
         uses: requarks/changelog-action@v1
+        # https://github.com/marketplace/actions/changelog-from-conventional-commits
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          fromTag: ${{ needs.Artefact-Version.outputs.draft_version }}
+          fromTag: ${{ needs.Artefact-Version.outputs.latest_tag }}
           toTag: HEAD
           writeToFile: true
+          excludeTypes: build,docs,other,style
+          changelogFilePath: CHANGELOG.md
+          includeRefIssues: true
+          useGitmojis: true
 
       - name: Gradle Build and Publish
         env:

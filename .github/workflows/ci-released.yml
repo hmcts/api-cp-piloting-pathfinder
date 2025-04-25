@@ -22,8 +22,40 @@ jobs:
           VERSION="${TAG_NAME#v}"  # strip 'v' prefix
           echo "RELEASED_VERSION=$VERSION" >> $GITHUB_OUTPUT
 
+  Update-Spec-Version:
+    needs: [ Artefact-Version ]
+    runs-on: ubuntu-latest
+    outputs:
+      openapi_file: ${{ steps.find_spec.outputs.openapi_file }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Find OpenAPI file
+        id: find_spec
+        env:
+          FILE_PATH_OPENAPI: "src/main/resources/openapi"
+        run: |
+          FILE=$(find ${FILE_PATH_OPENAPI} -name "*.openapi.yml" | head -n 1)
+          echo "openapi_file=$FILE" >> $GITHUB_OUTPUT
+
+      - name: Update info.version in OpenAPI spec using yq
+        env:
+          API_NAME: ${{ github.event.repository.name }}
+          API_VERSION: ${{ needs.Artefact-Version.outputs.RELEASED_VERSION }}
+        uses: mikefarah/yq@v4.45.1
+        with:
+          cmd: |
+            yq '
+              .info.version = strenv(API_VERSION) |
+              .servers[0].url = "https://virtserver.swaggerhub.com/HMCTS-DTS/" + strenv(API_NAME) + "/" + strenv(API_VERSION)
+            ' "${{ steps.find_spec.outputs.openapi_file }}" > openapi-versioned.yml
+
+      - name: Replace original OpenAPI file
+        run: mv openapi-versioned.yml "${{ steps.find_spec.outputs.openapi_file }}"
+
   Build:
-    needs: [Artefact-Version]
+    needs: [Artefact-Version, Update-Spec-Version]
     runs-on: ubuntu-latest
 
     steps:
@@ -40,22 +72,6 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: current
-
-      - name: Generate changelog from last release tag
-        run: |
-          echo "### Changelog for ${{ needs.Artefact-Version.outputs.RELEASED_VERSION }}" > CHANGELOG.md
-          LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || git tag --sort=-creatordate | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+' | head -n 1 || echo "")
-          if [ -z "$LAST_TAG" ]; then
-            echo "No previous tag found. Logging all commits."
-            git log --pretty=format:"- %s (%an)" --no-merges \
-              | sed -E "s/#([0-9]+)/[#\1]/g" \
-              >> CHANGELOG.md
-          else
-            echo "Generating changelog since $LAST_TAG"
-            git log --pretty=format:"- %s (%an)" --no-merges "$LAST_TAG"..HEAD \
-              | sed -E "s/#([0-9]+)/[#\1]/g" \
-              >> CHANGELOG.md
-          fi
 
       - name: Gradle Build and Publish
         env:

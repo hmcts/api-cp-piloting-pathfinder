@@ -6,10 +6,10 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-jobs:
   env:
     FILE_PATH_OPENAPI: "src/main/resources/openapi"
 
+jobs:
   Artefact-Version:
     runs-on: ubuntu-latest
     outputs:

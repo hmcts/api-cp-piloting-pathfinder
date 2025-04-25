@@ -6,10 +6,10 @@ on:
       - master
       - main
 
-jobs:
   env:
     FILE_PATH_OPENAPI: "src/main/resources/openapi"
 
+jobs:
   Artefact-Version:
     runs-on: ubuntu-latest
     outputs:

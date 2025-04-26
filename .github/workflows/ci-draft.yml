@@ -32,6 +32,7 @@ jobs:
           else
             LATEST_TAG="v0.0.0"
           fi
+          LATEST_TAG="${LATEST_TAG#v}"
           echo "latest_tag=$LATEST_TAG" >> $GITHUB_OUTPUT
 
           SHORT_SHA=$(git rev-parse --short HEAD)

@@ -55,10 +55,8 @@ tasks.named('jacocoTestReport') {
 tasks.named('check') {
   dependsOn tasks.named('jacocoTestReport')
 }
-tasks.named('sonar') {
- dependsOn tasks.named('jacocoTestReport')
-}
 
+// SonarQube analysis settings
 sonarqube {
   properties {
     property "sonar.projectName", "API CP :: ${rootProject.name}"
@@ -66,6 +64,10 @@ sonarqube {
     property "sonar.host.url", System.getenv("SONAR_HOST_URL") ?: "https://sonarcloud.io"
     property "sonar.token", System.getenv("SONAR_TOKEN") ?: ""
   }
+}
+
+tasks.named('sonar') {
+  dependsOn tasks.named('jacocoTestReport')
 }
 
 // check dependencies upon release ONLY

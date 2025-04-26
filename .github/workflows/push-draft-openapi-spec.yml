@@ -23,6 +23,7 @@ jobs:
           else
             LATEST_TAG="v0.0.0"
           fi
+          LATEST_TAG="${LATEST_TAG#v}"
 
           SHORT_SHA=$(git rev-parse --short HEAD)
           DRAFT_VERSION="${LATEST_TAG}-${SHORT_SHA}"

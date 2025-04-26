@@ -32,6 +32,7 @@ jobs:
           else
             LATEST_TAG="v0.0.0"
           fi
+          LATEST_TAG="${LATEST_TAG#v}"
           echo "latest_tag=$LATEST_TAG" >> $GITHUB_OUTPUT
 
           SHORT_SHA=$(git rev-parse --short HEAD)
@@ -100,6 +101,27 @@ jobs:
         with:
           name: updated-openapi-spec
           path: ${{ env.FILE_PATH_OPENAPI }}
+
+#      - name: Set Sonar Project Key and Name
+#        id: sonar_vars
+#        run: |
+#          repo_sanitized="${GITHUB_REPOSITORY//\//_}"
+#          echo "project_key=$repo_sanitized" >> $GITHUB_OUTPUT
+#          echo "project_name=$repo_sanitized" >> $GITHUB_OUTPUT
+#
+#      - name: Analyze with SonarCloud
+#        uses: SonarSource/sonarqube-scan-action@v5.1.0
+#        with:
+#          args: >
+#            -Dsonar.organization=hmcts
+#            -Dsonar.projectKey=${{ steps.sonar_vars.outputs.project_key }}
+#            -Dsonar.projectName=${{ steps.sonar_vars.outputs.project_name }}
+#            -Dsonar.projectVersion=${{ needs.Artefact-Version.outputs.draft_version }}
+#            -Dsonar.sources=src
+#            -Dsonar.java.binaries=build/classes
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
       - name: Gradle Build and Publish
         env:

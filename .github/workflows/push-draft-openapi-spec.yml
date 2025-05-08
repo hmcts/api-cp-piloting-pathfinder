@@ -6,6 +6,9 @@ on:
       - main
       - master
 
+env:
+  FILE_PATH_OPENAPI: "src/main/resources/openapi"
+
 jobs:
   API-Version:
     runs-on: ubuntu-latest
@@ -20,11 +23,12 @@ jobs:
       - name: Get short SHA for versioning
         id: vars
         run: |
-          if [ -n "$(git tag)" ]; then
-            LATEST_TAG=$(git describe --tags --abbrev=0)
+          if LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null); then
+            :
           else
             LATEST_TAG="v0.0.0"
           fi
+          echo "🏷️ Latest Git tag resolved to: $LATEST_TAG"
           LATEST_TAG="${LATEST_TAG#v}"
 
           SHORT_SHA=$(git rev-parse --short HEAD)
@@ -43,17 +47,19 @@ jobs:
 
       - name: Find OpenAPI file
         id: find_spec
-        env:
-          FILE_PATH_OPENAPI: "src/main/resources/openapi"
         run: |
-          FILE=$(find ${FILE_PATH_OPENAPI} -name "*.openapi.yml" | head -n 1)
+          FILE=$(find "${FILE_PATH_OPENAPI}" -name "*.openapi.yml" | head -n 1)
+          if [ -z "$FILE" ]; then
+            echo "⚠️ *** No OpenAPI spec (*.openapi.yml) found. Skipping publishing draft. ***"
+            exit 1
+          fi
           echo "openapi_file=$FILE" >> $GITHUB_OUTPUT
 
       - name: Update info.version in OpenAPI spec using yq
         env:
           API_NAME: ${{ github.event.repository.name }}
           API_VERSION: ${{ needs.API-Version.outputs.draft_version }}
-        uses: mikefarah/yq@v4.45.1
+        uses: mikefarah/yq@v4.45.2
         with:
           cmd: |
             yq '
@@ -61,10 +67,10 @@ jobs:
               .servers[0].url = "https://virtserver.swaggerhub.com/HMCTS-DTS/" + strenv(API_NAME) + "/" + strenv(API_VERSION)
             ' "${{ steps.find_spec.outputs.openapi_file }}" > openapi-versioned.yml
 
-      - name: Upload versioned OpenAPI spec
+      - name: Upload updated OpenAPI file
         uses: actions/upload-artifact@v4
         with:
-          name: openapi-versioned
+          name: updated-openapi-spec
           path: openapi-versioned.yml
 
   Push-API-to-APIHub:
@@ -77,7 +83,8 @@ jobs:
       - name: Download versioned OpenAPI spec
         uses: actions/download-artifact@v4
         with:
-          name: openapi-versioned
+          name: updated-openapi-spec
+          path: ./
 
       - name: Set up Node.js
         uses: actions/setup-node@v4

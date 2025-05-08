@@ -33,6 +33,7 @@ jobs:
           PMD_EXIT_CODE=$?
           set -e
           
+          # https://pmd.github.io/pmd/pmd_userdocs_cli_reference.html#exit-status
           if [[ "$PMD_EXIT_CODE" -eq 1 ]]; then
             echo "Unexpected internal error during PMD execution"
             exit 1

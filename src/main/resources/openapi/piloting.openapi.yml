@@ -1,12 +1,12 @@
 openapi: 3.0.0
 servers:
-  - description: APIHub API Auto Mocking Pilot API
-    url: https://virtserver.swaggerhub.com/HMCTS-DTS/api-cp-piloting-pathfinder/0.0.0
+  - description: APIHub API Auto Mocking court-hearing-judges
+    url: https://virtserver.swaggerhub.com/HMCTS-DTS/api-cp-refdata-courthearing-judges/0.0.0
 
 info:
+  description: Reference Data API providing information on Judges associated with a Court Hearing
   version: 0.0.0
-  title: Piloting API
-  description: A simple API for the experiments that will help shape the API strategy.
+  title: API CP Refdata Court Hearing Judges
   contact:
     email: no-reply@hmcts.com
   license:
@@ -36,12 +36,42 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "schema/piloting.json"
-              example:
-                judiciary:
-                  johTitle: "His Honour"
-                  johNameSurname: "John Smith"
-                  role: "judge"
-                  johKnownAs: "His Honour Judge Smith"
+                $ref: "#/components/schemas/Judges"
         '400':
           description: bad input parameter
+
+components:
+  schemas:
+    Judges:
+      type: object
+      properties:
+        judiciary:
+          type: object
+          description: Can be an array of objects as such will be a collective and use plurals for object arrays (clerks and scribes etc included)
+          properties:
+            johTitle:
+              type: string
+              description: The title for the judiciary
+              default: ""
+              example: His Honour
+            johNameSurname:
+              type: string
+              description: First and Surname of the JOH
+              pattern: "^.*$"
+              default: ""
+              example: John Smith
+            role:
+              type: string
+              description: Role of the judiciary
+              enum:
+                - judge
+                - magistrate
+                - clerk
+              example: judge
+            johKnownAs:
+              type: string
+              description: Name and salutations, titles to be presented on publications
+              pattern: "^.*$"
+              default: ""
+              example: His Honour Judge Smith
+          additionalProperties: false

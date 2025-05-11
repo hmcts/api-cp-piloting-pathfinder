@@ -1,12 +1,12 @@
 openapi: 3.0.0
 servers:
   - description: APIHub API Auto Mocking court-hearing-judges
-    url: https://virtserver.swaggerhub.com/HMCTS-DTS/api-cp-refdata-courthearing-judges/0.0.0
+    url: https://virtserver.swaggerhub.com/HMCTS-DTS/api-cp-piloting-pathfinder/0.0.0
 
 info:
-  description: Reference Data API providing information on Judges associated with a Court Hearing
+  title: Piloting API
+  description: A simple API for the experiments that will help shape the API strategy.
   version: 0.0.0
-  title: API CP Refdata Court Hearing Judges
   contact:
     email: no-reply@hmcts.com
   license:

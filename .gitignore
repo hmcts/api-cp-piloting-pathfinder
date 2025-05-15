@@ -1,6 +1,7 @@
 .gradle
 /build/
 gradle/wrapper
+!gradle/wrapper/gradle-wrapper.properties
 gradlew
 gradlew.bat
 *.class
@@ -20,13 +21,12 @@ bin
 *.iws
 *.iml
 *.ipr
+node_modules
+package.json
+package-lock.json
 
 *.log
 
 .DS_Store
 */.DS_Store
 /*report.html
-
-
-contract-tests/node_modules
-contract-tests/package-lock.json

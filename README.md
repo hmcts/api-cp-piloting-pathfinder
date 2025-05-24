@@ -1,5 +1,8 @@
 # API CP Piloting Pathfinder
 
+[![CI Gradle](https://github.com/hmcts/api-cp-piloting-pathfinder/actions/workflows/ci-released.yml/badge.svg)](https://github.com/hmcts/api-cp-piloting-pathfinder/actions/workflows/ci-released.yml)
+[![Publish OpenAPI Spec to APIHub (Release)](https://github.com/hmcts/api-cp-piloting-pathfinder/actions/workflows/publish-released-openapi-spec.yml/badge.svg)](https://github.com/hmcts/api-cp-piloting-pathfinder/actions/workflows/publish-released-openapi-spec.yml)
+
 This repository supports early experimentation, prototyping, and validation of API-based data sharing approaches to inform a scalable model for cross-CJS integration.
 
 ## Documentation

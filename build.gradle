@@ -5,7 +5,7 @@ plugins {
   id 'jacoco'
   id 'maven-publish'
   id "com.github.ben-manes.versions" version "0.52.0"
-  id "org.cyclonedx.bom" version "2.3.0"
+  id "org.cyclonedx.bom" version "2.3.1"
 }
 
 group = 'uk.gov.hmcts.cp'
@@ -14,14 +14,23 @@ def githubActor = project.findProperty("github.actor") ?: System.getenv("GITHUB_
 def githubToken = project.findProperty("github.token") ?: System.getenv("GITHUB_TOKEN")
 def githubRepo = System.getenv("GITHUB_REPOSITORY")
 
+def azureADOArtifactRepository = 'https://pkgs.dev.azure.com/hmcts/Artifacts/_packaging/hmcts-lib/maven/v1'
+def azureADOArtifactActor = System.getenv("AZURE_DEVOPS_ARTIFACT_USERNAME")
+def azureADOArtifactToken = System.getenv("AZURE_DEVOPS_ARTIFACT_TOKEN")
+
+
 //debugging
 //    if (githubActor != null) {
 //      println "🔐 Configuring GitHub Packages publishing to: https://maven.pkg.github.com/$githubRepo"
 //    }
 //    println "GitHub Packages publishing required environment variables:"
-//    println " - GITHUB_ACTOR=${githubActor != null ? '✔' : '❌'}"
-//    println " - GITHUB_TOKEN=${githubToken != null ? '✔' : '❌'}"
-//    println " - GITHUB_REPOSITORY=${githubRepo != null ? '✔' : '❌'}"
+//    println " - GITHUB_ACTOR=${githubActor != null ? ' ✔ FOUND' : '❌'}"
+//    println " - GITHUB_TOKEN=${githubToken != null ? ' ✔ FOUND' : '❌'}"
+//    println " - GITHUB_REPOSITORY=${githubRepo != null ? ' ✔ FOUND' : '❌'}"
+
+//    println "Azure ADO publishing required environment variables:"
+//    println " - AZURE_DEVOPS_ARTIFACT_USERNAME=${azureADOArtifactActor != null ? ' ✔ FOUND' : '❌'}"
+//    println " - AZURE_DEVOPS_ARTIFACT_TOKEN=${azureADOArtifactToken != null ? ' ✔ FOUND' : '❌'}"
 
 java {
   sourceCompatibility = JavaVersion.VERSION_21
@@ -88,7 +97,7 @@ repositories {
   mavenLocal()
   mavenCentral()
   maven {
-    url = 'https://jitpack.io'
+    url = azureADOArtifactRepository
   }
 }
 
@@ -105,6 +114,14 @@ publishing {
       credentials {
         username = githubActor
         password = githubToken
+      }
+    }
+    maven {
+      name = "AzureArtifacts"
+      url = uri(azureADOArtifactRepository)
+      credentials {
+        username = azureADOArtifactActor
+        password = azureADOArtifactToken
       }
     }
   }
@@ -218,15 +235,15 @@ tasks.withType(Checkstyle).configureEach {
 }
 
 ext {
-  springBootVersion = "3.4.5"
+  springBootVersion = "3.5.0"
   lombokVersion = "1.18.38"
 }
 
 dependencies {
   // OpenAPI Generator runtime support
   implementation 'org.openapitools:openapi-generator-core:7.13.0'
-  implementation 'io.swagger.parser.v3:swagger-parser:2.1.26'
-  implementation 'io.swagger.core.v3:swagger-annotations:2.2.30'
+  implementation 'io.swagger.parser.v3:swagger-parser:2.1.28'
+  implementation 'io.swagger.core.v3:swagger-annotations:2.2.32'
   implementation 'net.logstash.logback:logstash-logback-encoder:8.1'
 
   implementation 'com.fasterxml.jackson.core:jackson-annotations:2.19.0'
@@ -239,5 +256,4 @@ dependencies {
   testImplementation 'org.junit.jupiter:junit-jupiter-api'
   testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
   testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-  testImplementation 'au.com.dius.pact.consumer:junit5:4.6.9'
 }

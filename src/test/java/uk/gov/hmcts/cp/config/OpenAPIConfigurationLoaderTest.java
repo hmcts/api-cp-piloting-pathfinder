@@ -1,17 +1,20 @@
 package uk.gov.hmcts.cp.config;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
-import io.swagger.v3.oas.models.ExternalDocumentation;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+
+@Slf4j
 class OpenAPIConfigurationLoaderTest {
-
-    private static final Logger log = LoggerFactory.getLogger(OpenAPIConfigurationLoaderTest.class);
 
     @Test
     void openAPI_bean_should_have_expected_properties() {
@@ -41,7 +44,7 @@ class OpenAPIConfigurationLoaderTest {
         assertNotNull(openAPI.getServers());
         assertFalse(openAPI.getServers().isEmpty());
         assertEquals("https://virtserver.swaggerhub.com/HMCTS-DTS/" + apiGitHubRepository + "/" + expectedVersion,
-                     openAPI.getServers().get(0).getUrl());
+                openAPI.getServers().get(0).getUrl());
     }
 
     @Test
@@ -54,7 +57,7 @@ class OpenAPIConfigurationLoaderTest {
 
     @Test
     void loadOpenApiFromClasspath_should_throw_for_blank_path() {
-        try{
+        try {
             OpenAPIConfigurationLoader.loadOpenApiFromClasspath(" ");
             assert false;
         } catch (IllegalArgumentException e) {
@@ -64,7 +67,7 @@ class OpenAPIConfigurationLoaderTest {
 
     @Test
     void loadOpenApiFromClasspath_should_throw_for_null_path() {
-        try{
+        try {
             OpenAPIConfigurationLoader.loadOpenApiFromClasspath(null);
             assert false;
         } catch (IllegalArgumentException e) {

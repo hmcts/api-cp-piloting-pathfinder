@@ -25,12 +25,13 @@ public class AuthFilter extends OncePerRequestFilter {
     private boolean authFilterEnabled;
 
     public AuthFilter(@Value("${auth.filter.enabled:true}") final boolean authFilterEnabled) {
+        super();
         this.authFilterEnabled = authFilterEnabled;
     }
 
     @Override
     protected void doFilterInternal(final HttpServletRequest request, final HttpServletResponse response, final FilterChain filterChain) throws ServletException, IOException {
-        String cleanUri = request.getRequestURI()
+        final String cleanUri = request.getRequestURI()
                 .replaceAll("\\n", "")
                 .replaceAll("\\r", "");
         log.info("API RequestFilter enabled:{} called for url:{}", authFilterEnabled, cleanUri);

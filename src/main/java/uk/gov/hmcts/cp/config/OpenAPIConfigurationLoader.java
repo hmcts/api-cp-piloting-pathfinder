@@ -1,21 +1,18 @@
 package uk.gov.hmcts.cp.config;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.parser.OpenAPIV3Parser;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 
-import org.apache.commons.lang3.StringUtils;
-
+@Slf4j
 public class OpenAPIConfigurationLoader {
 
-    private static final Logger LOG = LoggerFactory.getLogger(OpenAPIConfigurationLoader.class);
     private static final String JUDGES_OPENAPI = "openapi/piloting.openapi.yml";
 
     public static OpenAPI loadOpenApiFromClasspath(final String path) {
@@ -25,7 +22,7 @@ public class OpenAPIConfigurationLoader {
 
         try (InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(path)) {
             if (inputStream == null) {
-                LOG.error("OpenAPI specification file path is required but was null or blank");
+                log.error("OpenAPI specification file path is required but was null or blank");
                 throw new IllegalArgumentException("Missing resource: " + path);
             }
             final String yaml = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);

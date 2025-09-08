@@ -9,13 +9,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class OpenApiObjectsTest {
 
     @Test
-    void shouldGenerateJudgesObject() {
+    void generateOpenApiModels_should_create_Judges() {
         Judges judges = Judges.builder().build();
         assertThat(judges).hasOnlyFields("judiciary");
     }
 
     @Test
-    void shouldGenerateErrorResponseObject() {
+    void generateOpenApiModels_should_create_ErrorResponse() {
         ErrorResponse errorResponse = ErrorResponse.builder().build();
         assertThat(errorResponse).hasOnlyFields("error",
                 "details",

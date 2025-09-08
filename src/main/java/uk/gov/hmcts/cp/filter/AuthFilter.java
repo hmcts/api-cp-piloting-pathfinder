@@ -19,15 +19,20 @@ import java.io.IOException;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @Component
 @Slf4j
-public class RequestFilter extends OncePerRequestFilter {
+public class AuthFilter extends OncePerRequestFilter {
     public final static String JWT_TOKEN_HEADER = "jwt";
 
-    @Value("${auth.filter.enabled:true}")
     private boolean authFilterEnabled;
 
+    public AuthFilter(@Value("${auth.filter.enabled:true}") boolean authFilterEnabled) {
+        this.authFilterEnabled = authFilterEnabled;
+    }
+
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        String cleanUri = request.getRequestURI().replaceAll("\\n", "");
+    protected void doFilterInternal(final HttpServletRequest request, final HttpServletResponse response, final FilterChain filterChain) throws ServletException, IOException {
+        String cleanUri = request.getRequestURI()
+                .replaceAll("\\n", "")
+                .replaceAll("\\r", "");
         log.info("API RequestFilter enabled:{} called for url:{}", authFilterEnabled, cleanUri);
         // We can pick off jwt token in here and validate it and then set the claims into an AuthContext object
         // For now lets just show that we can inject this filter into our parent service and do a simple check

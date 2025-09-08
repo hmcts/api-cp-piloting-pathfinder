@@ -24,7 +24,7 @@ public class AuthFilter extends OncePerRequestFilter {
 
     private boolean authFilterEnabled;
 
-    public AuthFilter(@Value("${auth.filter.enabled:true}") boolean authFilterEnabled) {
+    public AuthFilter(@Value("${auth.filter.enabled:true}") final boolean authFilterEnabled) {
         this.authFilterEnabled = authFilterEnabled;
     }
 

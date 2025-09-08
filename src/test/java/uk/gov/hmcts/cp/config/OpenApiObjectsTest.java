@@ -1,17 +1,17 @@
 package uk.gov.hmcts.cp.config;
 
 import org.junit.jupiter.api.Test;
+import uk.gov.hmcts.cp.openapi.model.Auth;
 import uk.gov.hmcts.cp.openapi.model.ErrorResponse;
-import uk.gov.hmcts.cp.openapi.model.Judges;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class OpenApiObjectsTest {
 
     @Test
-    void shouldGenerateJudgesObject() {
-        Judges judges = Judges.builder().build();
-        assertThat(judges).hasOnlyFields("judiciary");
+    void shouldGenerateAuthObject() {
+        Auth auth = Auth.builder().build();
+        assertThat(auth).hasOnlyFields("userName");
     }
 
     @Test

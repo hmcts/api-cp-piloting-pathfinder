@@ -27,7 +27,8 @@ public class RequestFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        log.info("API RequestFilter enabled:{} called for url:{}", authFilterEnabled, request.getRequestURI());
+        String cleanUri = request.getRequestURI().replaceAll("\\n", "");
+        log.info("API RequestFilter enabled:{} called for url:{}", authFilterEnabled, cleanUri);
         // We can pick off jwt token in here and validate it and then set the claims into an AuthContext object
         // For now lets just show that we can inject this filter into our parent service and do a simple check
         if (authFilterEnabled && request.getHeader(JWT_TOKEN_HEADER) == null) {

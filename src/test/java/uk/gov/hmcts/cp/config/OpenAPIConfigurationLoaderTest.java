@@ -21,7 +21,7 @@ class OpenAPIConfigurationLoaderTest {
         Info info = openAPI.getInfo();
         assertNotNull(info);
         assertEquals("Piloting API", info.getTitle());
-        assertEquals("A simple API to demonstrate best practice capabilities", info.getDescription());
+        assertEquals("A simple API for the experiments that will help shape the API strategy.", info.getDescription());
 
         String apiGitHubRepository = "api-cp-piloting-pathfinder";
         String expectedVersion = System.getProperty("API_SPEC_VERSION", "0.0.0");

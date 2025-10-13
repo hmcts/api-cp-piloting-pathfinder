@@ -73,7 +73,7 @@ jobs:
       - name: Check the API definition exists
         run: |
           set -o pipefail
-          swaggerhub api:get "${CLI_API_REF}" | jq
+          swaggerhub api:get "${CLI_API_REF}" | jq '.apis.[].properties'| grep url
           if ! swaggerhub api:get "${CLI_API_REF}" 2>&1 | tee error.log; then
             echo "❌ API definition was not found on APIHub"
             echo "--- CLI Error Output ---"

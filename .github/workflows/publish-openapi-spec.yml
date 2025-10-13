@@ -85,7 +85,7 @@ jobs:
         run: |
           set -o pipefail
             export VERSION="0.0.9"
-            swaggerhub api:get "${APIHUB_OWNER}/${API_NAME}" | jq '.apis.[].properties | select(.type == "Swagger")' > all-versions.json
+            swaggerhub api:get "${APIHUB_OWNER}/${API_NAME}/" | jq '.apis.[].properties | select(.type == "Swagger")' > all-versions.json
             echo "All versions ..."
             cat all-versions.json
             cat all-versions.json | egrep "${VERSION}\-[a-f0-9]{7}" > delete-versions.json

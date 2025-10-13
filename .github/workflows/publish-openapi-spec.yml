@@ -73,7 +73,6 @@ jobs:
       - name: Check the API definition exists
         run: |
           set -o pipefail
-          swaggerhub api:get "${CLI_API_REF}" | jq '.apis.[].properties'| grep url
           if ! swaggerhub api:get "${CLI_API_REF}" 2>&1 | tee error.log; then
             echo "❌ API definition was not found on APIHub"
             echo "--- CLI Error Output ---"
@@ -85,7 +84,15 @@ jobs:
       - name: Validate definition
         run: |
           set -o pipefail
-          if ! swaggerhub api:validate "${CLI_API_REF}" 2>&1 | tee error.log; then
+            export VERSION="0.0.9"
+            swaggerhub api:get "${APIHUB_OWNER}/${API_NAME}" | jq '.apis.[].properties | select(.type == "Swagger")' > all-versions.json
+            echo "All versions ..."
+            cat all-versions.json
+            cat all-versions.json | egrep "${VERSION}\-[a-f0-9]{7}" > delete-versions.json
+            echo "Delete versions matching ${VERSION}..."
+            cat delete-versions.json
+            echo "===== END ===="
+            if ! swaggerhub api:validate "${CLI_API_REF}" 2>&1 | tee error.log; then
             echo "❌ OpenAPI definition failed validation"
             echo "--- CLI Error Output ---"
             cat error.log

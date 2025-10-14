@@ -98,7 +98,7 @@ jobs:
         # And then filter for those with sha snapshot versions i.e.  1.0.0-be4c28d
         # Then delete all those found
       - name: Delete snapshot versions
-        # if: inputs.is_release
+        if: inputs.is_release
         run: |
             set -o pipefail
             echo "DELETING ${APIHUB_OWNER}/${API_NAME} snapshots"

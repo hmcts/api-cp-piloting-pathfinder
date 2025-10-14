@@ -84,21 +84,30 @@ jobs:
       - name: Validate definition
         run: |
           set -o pipefail
-            echo "CLI_API_REF:${CLI_API_REF}"
-            export VERSION="0.0.9"
-            swaggerhub api:get "${CLI_API_REF}" | jq '.apis.[].properties | select(.type == "Swagger")' > all-versions.json
-            echo "All versions ..."
-            cat all-versions.json
-            cat all-versions.json | egrep "${VERSION}\-[a-f0-9]{7}" > delete-versions.json
-            echo "Delete versions matching ${VERSION}..."
-            cat delete-versions.json
-            echo "===== END ===="
             if ! swaggerhub api:validate "${CLI_API_REF}" 2>&1 | tee error.log; then
             echo "❌ OpenAPI definition failed validation"
             echo "--- CLI Error Output ---"
             cat error.log
             exit 1
           fi
+
+      - name: Delete old versions
+        run: |
+            export VERSION="0.0.9"
+            echo "Currently deleting FIRST snapshots for ${VERSION} not ${API_VERSION}"
+            swaggerhub api:get "${APIHUB_OWNER}/${API_NAME}/" | jq '.apis.[].properties[] | select(.type == "X-Version")' > all-versions.json
+            echo "all-versions ... START"
+            cat all-versions.json
+            echo "all-versions ... END"
+            cat all-versions.json | egrep "${VERSION}\-[a-f0-9]{7}" | awk '{ print $2 }' | sed s/\"//g > delete-versions.json
+            echo "delete-versions ... START"
+            cat delete-versions.json
+            echo "delete-versions ... END"
+            cat delete-versions.json | head -1 | while read DELETEV
+            do
+                echo "deleting ${API_NAME} with version ${DELETEV}"
+                swaggerhub api:delete "${APIHUB_OWNER}/${API_NAME}/${DELETEV}" -f
+            done
 
         # https://github.com/SmartBear/swaggerhub-cli?tab=readme-ov-file#swaggerhub-apisetdefault
       - name: Set released version to the default API Definition

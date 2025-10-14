@@ -87,7 +87,7 @@ jobs:
       - name: Validate definition
         run: |
           set -o pipefail
-            if ! swaggerhub api:validate "${CLI_API_REF}" 2>&1 | tee error.log; then
+          if ! swaggerhub api:validate "${CLI_API_REF}" 2>&1 | tee error.log; then
             echo "❌ OpenAPI definition failed validation"
             echo "--- CLI Error Output ---"
             cat error.log

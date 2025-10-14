@@ -91,15 +91,18 @@ jobs:
             exit 1
           fi
 
+        # If release version then delete all matching snapshots
+        # i.e. version 1.0.0 delete such as 1.0.0-be4c28d
       - name: Delete old versions
         run: |
-            export VERSION="0.0.9"
-            echo "Currently deleting FIRST snapshots for ${VERSION} not ${API_VERSION}"
+            export TESTVERSION="0.0.9"
+            echo "CLI_API_REF is ${CLI_API_REF}!"
+            echo "DELETING FIRST snapshots ${APIHUB_OWNER}/${API_NAME}/ for ${TESTVERSION}"
             swaggerhub api:get "${APIHUB_OWNER}/${API_NAME}/" | jq '.apis.[].properties[] | select(.type == "X-Version")' > all-versions.json
             echo "all-versions ... START"
             cat all-versions.json
             echo "all-versions ... END"
-            cat all-versions.json | egrep "${VERSION}\-[a-f0-9]{7}" | awk '{ print $2 }' | sed s/\"//g > delete-versions.json
+            cat all-versions.json | egrep "${TESTVERSION}\-[a-f0-9]{7}" | awk '{ print $2 }' | sed s/\"//g > delete-versions.json
             echo "delete-versions ... START"
             cat delete-versions.json
             echo "delete-versions ... END"

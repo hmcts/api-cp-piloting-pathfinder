@@ -94,18 +94,19 @@ jobs:
             exit 1
           fi
 
-        # If release version then delete all matching snapshots
-        # i.e. version 1.0.0 delete such as 1.0.0-be4c28d
+        # If release version then find all apis where published=false
+        # And then filter for those with sha snapshot versions i.e.  1.0.0-be4c28d
+        # Then delete all those found
       - name: Delete snapshot versions
         # if: inputs.is_release
         run: |
             set -o pipefail
             echo "DELETING ${APIHUB_OWNER}/${API_NAME} snapshots"
-            swaggerhub api:get "${APIHUB_OWNER}/${API_NAME}/" | jq '.apis.[].properties[] | select(.type == "X-Version")' > all-versions.json
-            echo "all-versions ... START"
-            cat all-versions.json
-            echo "all-versions ... END"
-            cat all-versions.json | egrep "value.*\-[a-f0-9]{7}" | awk '{ print $2 }' | sed s/\"//g > delete-versions.json
+            swaggerhub api:get "${APIHUB_OWNER}/${API_NAME}/" | jq '.apis.[] | select( any(.properties[]; .type == "X-Published" and .value=="false") ) | .properties[] | select(.type == "X-Version")' > unpublished-versions.json
+            echo "unpublished-versions ... START"
+            cat unpublished-versions.json
+            echo "unpublished-versions ... END"
+            cat unpublished-versions.json | egrep "value.*\-[a-f0-9]{7}" | awk '{ print $2 }' | sed s/\"//g > delete-versions.json
             echo "delete-versions ... START"
             cat delete-versions.json
             echo "delete-versions ... END"

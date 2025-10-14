@@ -41,12 +41,15 @@ jobs:
       - name: Install SwaggerHub CLI
         run: npm install -g swaggerhub-cli
 
-      - name: Set CLI_API_REF env var
+      - name: Set env variables in ${GITHUB_ENV}
         env:
           APIHUB_OWNER: ${{ inputs.apihub_owner }}
           API_NAME: ${{ inputs.api_name }}
           API_VERSION: ${{ inputs.api_version }}
         run: |
+          echo "APIHUB_OWNER=${APIHUB_OWNER}" >> "$GITHUB_ENV"
+          echo "API_NAME=${API_NAME}" >> "$GITHUB_ENV"
+          echo "API_VERSION=${API_VERSION}" >> "$GITHUB_ENV"
           echo "CLI_API_REF=${APIHUB_OWNER}/${API_NAME}/${API_VERSION}" >> "$GITHUB_ENV"
           echo "Using CLI_API_REF=${CLI_API_REF}"
 
@@ -90,6 +93,27 @@ jobs:
             cat error.log
             exit 1
           fi
+
+        # If release version then delete all matching snapshots
+        # i.e. version 1.0.0 delete such as 1.0.0-be4c28d
+      - name: Delete snapshot versions
+        if: inputs.is_release
+        run: |
+            set -o pipefail
+            echo "DELETING ${APIHUB_OWNER}/${API_NAME}/ snapshots for ${API_VERSION}"
+            swaggerhub api:get "${APIHUB_OWNER}/${API_NAME}/" | jq '.apis.[].properties[] | select(.type == "X-Version")' > all-versions.json
+            echo "all-versions ... START"
+            cat all-versions.json
+            echo "all-versions ... END"
+            cat all-versions.json | egrep "${API_VERSION}\-[a-f0-9]{7}" | awk '{ print $2 }' | sed s/\"//g > delete-versions.json
+            echo "delete-versions ... START"
+            cat delete-versions.json
+            echo "delete-versions ... END"
+            cat delete-versions.json | while read DELETEVERSION
+            do
+                echo "deleting ${API_NAME} with version ${DELETEVERSION}"
+                swaggerhub api:delete "${APIHUB_OWNER}/${API_NAME}/${DELETEVERSION}" -f
+            done
 
         # https://github.com/SmartBear/swaggerhub-cli?tab=readme-ov-file#swaggerhub-apisetdefault
       - name: Set released version to the default API Definition

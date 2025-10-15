@@ -110,7 +110,7 @@ jobs:
             echo "delete-versions ... START"
             cat delete-versions.json
             echo "delete-versions ... END"
-            cat delete-versions.json | head -1 | while read DELETEVERSION
+            cat delete-versions.json | while read DELETEVERSION
             do
                 echo "deleting ${API_NAME} with version ${DELETEVERSION}"
                 swaggerhub api:delete "${APIHUB_OWNER}/${API_NAME}/${DELETEVERSION}" -f

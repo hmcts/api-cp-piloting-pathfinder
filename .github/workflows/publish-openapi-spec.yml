@@ -27,7 +27,7 @@ jobs:
   Push-API-to-APIHub:
     runs-on: ubuntu-latest
     steps:
-      - uses: hmcts/publish-openapi-spec-to-apihub@main
+      - uses: hmcts/publish-openapi-spec-to-apihub@v1
         with:
           swaggerhub_api_key: ${{ secrets.SWAGGERHUB_API_KEY }}
           upload_artifact_name: ${{ inputs.upload_artifact_name }}

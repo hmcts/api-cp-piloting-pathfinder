@@ -30,3 +30,8 @@ jobs:
       - uses: hmcts/publish-openapi-spec-to-apihub@temp
         with:
           swaggerhub_api_key: ${{ secrets.SWAGGERHUB_API_KEY }}
+          upload_artifact_name: ${{ inputs.upload_artifact_name }}
+          apihub_owner: ${{ inputs.apihub_owner}}
+          api_name: ${{ inputs.api_name}}
+          api_version: ${{ inputs.api_version}}
+          is_release: ${{ inputs.is_release}}

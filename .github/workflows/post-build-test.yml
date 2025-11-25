@@ -1,0 +1,27 @@
+name: Post build test
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  example-job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v5
+        with:
+          gradle-version: current
+
+      - name: Gradle Build and Publish
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gradle build -x test
+
+      - name: Check cyclonedx bom.json in jarfile
+        run: jar tvf ./build/libs/*.jar

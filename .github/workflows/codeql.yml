@@ -40,7 +40,7 @@ jobs:
     - uses: actions/setup-java@v5
       with:
         distribution: 'temurin'
-        java-version: 21
+        java-version: '21'
 
     - name: Set up Gradle
       uses: gradle/actions/setup-gradle@v5
@@ -51,7 +51,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        gradle build cyclonedxBom -x test \
+        gradle cyclonedxBom build -x test \
           -DGITHUB_REPOSITORY=${{ github.repository }} \
           -DGITHUB_ACTOR=${{ github.actor }} \
           -DGITHUB_TOKEN=$GITHUB_TOKEN
@@ -66,7 +66,7 @@ jobs:
         category: "/language:${{matrix.language}}"
 
     - name: Log generated SBOM Hash
-      run: sha256sum build/reports/bom.json || true
+      run: sha256sum build/reports/cyclonedx/bom.json || true
 
       # This ensures:
       # - The SBOM is archived with the CodeQL scan output
@@ -76,4 +76,4 @@ jobs:
       uses: actions/upload-artifact@v5
       with:
         name: sbom
-        path: build/reports/bom.json
+        path: build/reports/cyclonedx/bom.json

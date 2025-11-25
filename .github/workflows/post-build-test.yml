@@ -24,4 +24,4 @@ jobs:
           gradle build -x test
 
       - name: Check cyclonedx bom.json in jarfile
-        run: .github/workflows/post-build-test.sh
+        run: sh .github/workflows/post-build-test.sh

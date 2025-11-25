@@ -87,7 +87,9 @@ jobs:
           JAVA_VERSION: ${{ matrix.java }}
         run: |
           echo "Building with ARTEFACT_VERSION=$ARTEFACT_VERSION using Java $JAVA_VERSION"
+          gradle cyclonedx
           gradle build -DAPI_SPEC_VERSION=$ARTEFACT_VERSION
+          sh .github/workflows/post-build-test.sh
 
   Push-Draft-OpenAPI-Spec:
     if: github.event_name == 'push'
@@ -138,7 +140,7 @@ jobs:
           JAVA_VERSION: ${{ matrix.java }}
         run: |
           echo "Publishing artefact for ARTEFACT_VERSION=$ARTEFACT_VERSION using Java $JAVA_VERSION"
-          
+          gradle cyclonedx
           gradle build -x test publish \
             -DAPI_SPEC_VERSION=$ARTEFACT_VERSION \
             -DGITHUB_REPOSITORY=${{ github.repository }} \
@@ -146,3 +148,4 @@ jobs:
             -DGITHUB_TOKEN=$GITHUB_TOKEN \
             -DAZURE_DEVOPS_ARTIFACT_USERNAME=$AZURE_DEVOPS_ARTIFACT_USERNAME \
             -DAZURE_DEVOPS_ARTIFACT_TOKEN=$AZURE_DEVOPS_ARTIFACT_TOKEN
+          sh .github/workflows/post-build-test.sh

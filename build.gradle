@@ -1,11 +1,11 @@
 plugins {
   id 'java'
-  id 'org.openapi.generator' version '7.15.0'
-  id 'com.diffplug.spotless' version '7.2.1'
+  id 'org.openapi.generator' version '7.17.0'
+  id 'com.diffplug.spotless' version '8.0.0'
   id 'jacoco'
   id 'maven-publish'
-  id "com.github.ben-manes.versions" version "0.52.0"
-  id "org.cyclonedx.bom" version "2.4.0"
+  id "com.github.ben-manes.versions" version "0.53.0"
+  id "org.cyclonedx.bom" version "3.0.2"
   id 'pmd'
 }
 
@@ -13,7 +13,7 @@ group = 'uk.gov.hmcts.cp'
 version = System.getProperty('API_SPEC_VERSION') ?: '0.0.999'
 
 apply {
-  from("$rootDir/gradle/localConfigs.gradle")
+  from("$rootDir/gradle/includeLocalConfigs.gradle")
 }
 
 java {
@@ -23,15 +23,15 @@ java {
 }
 
 ext {
-  springBootVersion = "4.0.0-M2"
+  springBootVersion = "4.0.0"
   lombokVersion = "1.18.38"
 }
 
 dependencies {
   // OpenAPI Generator runtime support
-  implementation 'org.openapitools:openapi-generator-core:7.15.0'
-  implementation 'io.swagger.parser.v3:swagger-parser:2.1.34'
-  implementation 'io.swagger.core.v3:swagger-annotations:2.2.37'
+  implementation 'org.openapitools:openapi-generator-core:7.16.0'
+  implementation 'io.swagger.parser.v3:swagger-parser:2.1.35'
+  implementation 'io.swagger.core.v3:swagger-annotations:2.2.39'
   implementation 'net.logstash.logback:logstash-logback-encoder:8.1'
 
   implementation 'com.fasterxml.jackson.core:jackson-annotations:2.20'

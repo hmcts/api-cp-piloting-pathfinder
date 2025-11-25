@@ -13,7 +13,6 @@
             <property name="junit5TestPattern" value="^[a-z][a-zA-Z0-9_]*$"/>
         </properties>
     </rule>
-
     <rule ref="category/java/bestpractices.xml">
         <exclude name="GuardLogStatement"/>
         <exclude name="UnitTestAssertionsShouldIncludeMessage"/>

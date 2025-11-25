@@ -87,7 +87,7 @@ jobs:
           JAVA_VERSION: ${{ matrix.java }}
         run: |
           echo "Building with ARTEFACT_VERSION=$ARTEFACT_VERSION using Java $JAVA_VERSION"
-          gradle cyclonedx
+          gradle cyclonedxBom
           gradle build -DAPI_SPEC_VERSION=$ARTEFACT_VERSION
           sh .github/post-build-test.sh
 
@@ -140,7 +140,7 @@ jobs:
           JAVA_VERSION: ${{ matrix.java }}
         run: |
           echo "Publishing artefact for ARTEFACT_VERSION=$ARTEFACT_VERSION using Java $JAVA_VERSION"
-          gradle cyclonedx
+          gradle cyclonedxBom
           gradle build -x test publish \
             -DAPI_SPEC_VERSION=$ARTEFACT_VERSION \
             -DGITHUB_REPOSITORY=${{ github.repository }} \

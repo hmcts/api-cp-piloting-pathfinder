@@ -24,4 +24,13 @@ jobs:
           gradle build -x test
 
       - name: Check cyclonedx bom.json in jarfile
-        run: jar tvf ./build/libs/*.jar
+        run: >
+          jar tvf ./build/libs/*.jar |
+          grep "bom.json" >/dev/null
+          if [[ $? -eq 0 ]]
+          then
+            echo "Found bom.json in jarfile"
+          else
+            echo "Failed to find bom.json in jarfile"
+            exit 1
+          fi

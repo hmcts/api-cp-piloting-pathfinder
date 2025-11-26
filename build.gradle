@@ -14,17 +14,11 @@ version = System.getProperty('API_SPEC_VERSION') ?: '0.0.999'
 
 apply {
   from("$rootDir/gradle/repositories.gradle")
-  from("$rootDir/gradle/sourceSets.gradle")
+  from("$rootDir/gradle/java.gradle")
   from("$rootDir/gradle/dependency.gradle")
   from("$rootDir/gradle/pmd.gradle")
   from("$rootDir/gradle/test.gradle")
   from("$rootDir/gradle/openApi.gradle")
-}
-
-java {
-  def javaVersion = JavaVersion.toVersion(System.getProperty("java.version"))
-  sourceCompatibility = javaVersion
-  targetCompatibility = javaVersion
 }
 
 ext {

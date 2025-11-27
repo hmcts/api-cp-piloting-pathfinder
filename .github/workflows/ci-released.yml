@@ -50,7 +50,7 @@ jobs:
 
   Push-Release-OpenAPI-Spec:
     needs: [ Artefact-Version, Update-Spec-Version ]
-    uses: ./.github/workflows/publish-openapi-spec-to-apihub.yml
+    uses: ./.github/workflows/publish-openapi-spec.yml
     secrets:
       SWAGGERHUB_API_KEY: ${{ secrets.APIHUB_API_KEY }}
     with:
@@ -103,4 +103,3 @@ jobs:
             -DGITHUB_TOKEN=$GITHUB_TOKEN \
             -DAZURE_DEVOPS_ARTIFACT_USERNAME=$AZURE_DEVOPS_ARTIFACT_USERNAME \
             -DAZURE_DEVOPS_ARTIFACT_TOKEN=$AZURE_DEVOPS_ARTIFACT_TOKEN
-

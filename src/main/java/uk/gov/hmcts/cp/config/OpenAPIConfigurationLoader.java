@@ -13,7 +13,7 @@ import java.nio.charset.StandardCharsets;
 @Slf4j
 public class OpenAPIConfigurationLoader {
 
-    private static final String JUDGES_OPENAPI = "openapi/piloting.openapi.yml";
+    private static final String JUDGES_OPENAPI = "openapi/openapi-spec.yml";
 
     public static OpenAPI loadOpenApiFromClasspath(final String path) {
         if (StringUtils.isBlank(path)) {
